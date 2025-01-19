@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        .task-list {
+            list-style: none;
+            padding: 0;
+        }
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+            border-left-width: 5px; /* For priority color */
+            cursor: pointer; /* Make it clickable */
+        }
+        .completed {
+            text-decoration: line-through;
+        }
+        .high { border-left-color: red; }
+        .medium { border-left-color: orange; }
+        .low { border-left-color: green; }
+        .add-task {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .add-task input, .add-task select {
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            flex: 1;
+        }
+        .add-task button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .delete-btn{
+            background-color: #f44336; /* Red */
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin-left: auto;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Task Manager</h1>
+
+    <div class="add-task">
+        <input type="text" id="task-title" placeholder="Task Title">
+        <select id="task-priority">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+        </select>
+        <button id="add-task-btn">Add Task</button>
+    </div>
+
+    <ul class="task-list" id="task-list">
+        </ul>
+
+    <script>
+        const taskTitleInput = document.getElementById('task-title');
+        const taskPrioritySelect = document.getElementById('task-priority');
+        const addTaskButton = document.getElementById('add-task-btn');
+        const taskList = document.getElementById('task-list');
+
+        let tasks = []; // Store tasks in an array
+
+        // Function to render tasks
+        function renderTasks() {
+            taskList.innerHTML = ''; // Clear the list
+            tasks.forEach((task, index) => {
+                const li = document.createElement('li');
+                li.classList.add('task-item', task.priority);
+                if (task.completed) {
+                    li.classList.add('completed');
+                }
+                li.innerHTML = `
+                <span>${task.title}</span>
+                <button class="delete-btn" data-index="${index}">Delete</button>
+                `;
+
+                li.addEventListener('click', () => {
+                    task.completed = !task.completed;
+                    renderTasks(); // Re-render to update UI
+                });
+                taskList.appendChild(li);
+            });
+            const deleteButtons = document.querySelectorAll('.delete-btn');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const index = button.dataset.index;
+                    tasks.splice(index, 1);
+                    renderTasks();
+                });
+            });
+        }
+
+        addTaskButton.addEventListener('click', () => {
+            const title = taskTitleInput.value.trim();
+            const priority = taskPrioritySelect.value;
+
+            if (title !== '') {
+                tasks.push({ title, priority, completed: false });
+                taskTitleInput.value = ''; // Clear input
+                renderTasks(); // Update the displayed list
+            }
+        });
+
+        renderTasks();//render task on load
+    </script>
+
+</body>
+</html>
